@@ -1,0 +1,11 @@
+ucimlrepo
+pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+xgboost
+imbalanced-learn
+shap
+faker
+jupyter
