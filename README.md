@@ -108,7 +108,7 @@ Individual prediction breakdown:
 **Local:**
 
 ```bash
-git clone https://github.com/<your-username>/credit-early-warning.git
+git clone https://github.com/lramosc1512/credit-early-warning.git
 cd credit-early-warning
 pip install -r requirements.txt
 jupyter notebook previsao_inadimplencia_cartao_credito.ipynb
