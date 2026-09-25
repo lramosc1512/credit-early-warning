@@ -1,109 +1,109 @@
 # Credit Early Warning
 
-Early warning model for credit card default. End-to-end machine learning pipeline to predict whether a credit card client will default on the next month's payment. Built as the final project for the Machine Learning Engineering course of the postgraduate program in AI Engineering at UniCEUB (Brasília, Brazil).
+Português | [English](README.en.md)
 
-> The notebook is written in Portuguese. Code, outputs and charts are readable regardless of language.
+Modelo de alerta de inadimplência em cartão de crédito. Pipeline completo de Machine Learning para prever se um cliente vai deixar de pagar a fatura no mês seguinte. Desenvolvido como projeto final da disciplina de Engenharia de Aprendizado de Máquina da pós-graduação em Engenharia de IA da UniCEUB (Brasília).
 
-**[Open the notebook in Google Colab](https://colab.research.google.com/drive/1-i_1RuEuG3neY7lfPizUtB9SF5eduMdq?usp=sharing)**
+**[Abrir o notebook no Google Colab](https://colab.research.google.com/drive/1-i_1RuEuG3neY7lfPizUtB9SF5eduMdq?usp=sharing)**
 
-## Problem
+## Problema
 
-Binary classification: given a client's profile and last 6 months of payment history, predict default in the following month (1 = default, 0 = paid).
+Classificação binária: a partir do perfil do cliente e dos últimos 6 meses de histórico de pagamento, prever se ele fica inadimplente no mês seguinte (1 = inadimplente, 0 = adimplente).
 
-Minimum targets set by the course:
+Metas mínimas definidas pela disciplina:
 
-| Metric | Target |
+| Métrica | Meta |
 |---|---|
-| AUC-ROC | ≥ 0.75 |
-| Recall | ≥ 0.60 |
-| F1-Score | ≥ 0.65 |
+| AUC-ROC | ≥ 0,75 |
+| Recall | ≥ 0,60 |
+| F1-Score | ≥ 0,65 |
 
 ## Dataset
 
-[Default of Credit Card Clients](https://archive.ics.uci.edu/dataset/350/default+of+credit+card+clients), UCI Machine Learning Repository (id=350), licensed under CC BY 4.0.
+[Default of Credit Card Clients](https://archive.ics.uci.edu/dataset/350/default+of+credit+card+clients), UCI Machine Learning Repository (id=350), licença CC BY 4.0.
 
-- 30,000 clients, 23 features
-- Imbalanced target: 77.9% paid, 22.1% default
-- Loaded directly with `ucimlrepo`, no local files or authentication needed
+- 30.000 clientes, 23 atributos
+- Classes desbalanceadas: 77,9% adimplentes, 22,1% inadimplentes
+- Carregado direto com `ucimlrepo`, sem arquivos locais nem autenticação
 
 ## Pipeline
 
-1. **Data loading** with `ucimlrepo` and renaming of the generic columns (`X1`...`X23`) using the dataset's own metadata
-2. **EDA**: distributions, correlations, default rate by group, outliers
-3. **Cleaning**: undocumented category codes in `EDUCATION` (0, 5, 6) and `MARRIAGE` (0) grouped into the existing "other" category
-4. **Feature engineering**: 4 derived features
-   - `utilizacao_credito`: latest bill / credit limit
-   - `media_atraso`: mean of the 6 payment status codes
-   - `meses_em_atraso`: number of months with late payment
-   - `proporcao_pagamento`: total paid / total billed
-5. **Split**: stratified 70/15/15 (train/validation/test), `StandardScaler` fit on train only
-6. **Modeling**: Logistic Regression, Decision Tree, Random Forest, SVM, then Gradient Boosting, SMOTE and XGBoost
-7. **Tuning**: `RandomizedSearchCV` optimizing F1, plus decision threshold search (maximize F1 with Recall ≥ 0.60)
-8. **Explainability** with SHAP (TreeExplainer)
-9. **Demo** on synthetic clients generated with `faker`
-10. **Monitoring proposal** with a PSI (Population Stability Index) function for drift detection
+1. **Carregamento** com `ucimlrepo` e renomeação das colunas genéricas (`X1`...`X23`) usando os metadados do próprio dataset
+2. **EDA**: distribuições, correlações, taxa de inadimplência por grupo, outliers
+3. **Limpeza**: códigos fora do dicionário oficial em `EDUCATION` (0, 5, 6) e `MARRIAGE` (0) agrupados na categoria "outros" já existente
+4. **Engenharia de atributos**: 4 variáveis derivadas
+   - `utilizacao_credito`: fatura mais recente / limite de crédito
+   - `media_atraso`: média dos 6 códigos de status de pagamento
+   - `meses_em_atraso`: quantidade de meses com atraso
+   - `proporcao_pagamento`: total pago / total faturado
+5. **Separação**: 70/15/15 estratificado (treino/validação/teste), `StandardScaler` ajustado só no treino
+6. **Modelagem**: Regressão Logística, Árvore de Decisão, Random Forest, SVM, e depois Gradient Boosting, SMOTE e XGBoost
+7. **Ajuste**: `RandomizedSearchCV` otimizando F1, mais busca do threshold de decisão (maximizar F1 com Recall ≥ 0,60)
+8. **Explicabilidade** com SHAP (TreeExplainer)
+9. **Demonstração** com clientes sintéticos gerados pelo `faker`
+10. **Proposta de monitoramento** com função de PSI (Population Stability Index) para detecção de drift
 
-## Results (validation set)
+## Resultados (conjunto de validação)
 
-Baseline models, default hyperparameters:
+Modelos base, com hiperparâmetros padrão:
 
-| Model | AUC-ROC | F1 | Recall | Precision |
+| Modelo | AUC-ROC | F1 | Recall | Precision |
 |---|---|---|---|---|
-| Random Forest | 0.758 | 0.463 | 0.363 | 0.639 |
-| Logistic Regression | 0.748 | 0.397 | 0.282 | 0.666 |
-| SVM | 0.724 | 0.444 | 0.337 | 0.652 |
-| Decision Tree | 0.591 | 0.364 | 0.369 | 0.359 |
+| Random Forest | 0,758 | 0,463 | 0,363 | 0,639 |
+| Regressão Logística | 0,748 | 0,397 | 0,282 | 0,666 |
+| SVM | 0,724 | 0,444 | 0,337 | 0,652 |
+| Árvore de Decisão | 0,591 | 0,364 | 0,369 | 0,359 |
 
-Progression of the techniques tested:
+Evolução das técnicas testadas:
 
-| Step | AUC-ROC | F1 | Recall |
+| Etapa | AUC-ROC | F1 | Recall |
 |---|---|---|---|
-| Random Forest baseline | 0.758 | 0.463 | 0.363 |
-| + `class_weight="balanced"` | 0.755 | 0.432 | 0.327 |
-| + hyperparameter tuning | 0.778 | 0.539 | 0.579 |
-| + threshold adjustment | 0.778 | 0.535 | 0.606 |
-| **Gradient Boosting + threshold (final)** | **0.782** | **0.543** | **0.619** |
-| Gradient Boosting + SMOTE + threshold | 0.772 | 0.530 | 0.603 |
-| XGBoost + threshold | 0.756 | 0.507 | 0.610 |
+| Random Forest base | 0,758 | 0,463 | 0,363 |
+| + `class_weight="balanced"` | 0,755 | 0,432 | 0,327 |
+| + ajuste de hiperparâmetros | 0,778 | 0,539 | 0,579 |
+| + ajuste de threshold | 0,778 | 0,535 | 0,606 |
+| **Gradient Boosting + threshold (final)** | **0,782** | **0,543** | **0,619** |
+| Gradient Boosting + SMOTE + threshold | 0,772 | 0,530 | 0,603 |
+| XGBoost + threshold | 0,756 | 0,507 | 0,610 |
 
-**Final model:** Gradient Boosting with the derived features, decision threshold at 0.2325.
-AUC-ROC and Recall met the targets. F1 (0.543) stayed below 0.65.
+**Modelo final:** Gradient Boosting com as variáveis derivadas e threshold de decisão em 0,2325.
+AUC-ROC e Recall atingiram as metas. O F1 (0,543) ficou abaixo de 0,65.
 
-### Why F1 didn't reach the target
+### Por que o F1 não bateu a meta
 
-To get F1 = 0.65 with Recall = 0.60, Precision would need to be around 0.71. The final model reached 0.484. Class balancing, tuning, extra features, boosting, SMOTE and XGBoost all landed F1 in the 0.50 to 0.54 range, which points to class overlap in the available features rather than a modeling choice that could be fixed with more tuning.
+Para chegar a F1 = 0,65 com Recall = 0,60, a Precision precisaria ficar em torno de 0,71. O modelo final chegou a 0,484. Balanceamento de classes, ajuste de hiperparâmetros, variáveis novas, boosting, SMOTE e XGBoost deixaram o F1 sempre entre 0,50 e 0,54, o que aponta para sobreposição entre as classes nos atributos disponíveis, e não para uma escolha de modelagem que se resolveria com mais ajuste.
 
-## Explainability (SHAP)
+## Explicabilidade (SHAP)
 
-`PAY_0` (most recent payment status) is the strongest predictor. Two of the engineered features ranked 2nd (`meses_em_atraso`) and 4th (`utilizacao_credito`). Higher credit limits push predictions toward lower risk.
+`PAY_0` (status de pagamento mais recente) é o atributo com mais peso. Duas das variáveis criadas no projeto ficaram em 2º (`meses_em_atraso`) e 4º lugar (`utilizacao_credito`). Limites de crédito mais altos puxam a previsão para menor risco.
 
 <p align="center">
   <img src="images/shap_importancia.png" width="45%">
   <img src="images/shap_direcao_impacto.png" width="45%">
 </p>
 
-Individual prediction breakdown:
+Explicação de uma previsão individual:
 
 <p align="center">
   <img src="images/shap_waterfall.png" width="70%">
 </p>
 
-## Monitoring proposal
+## Proposta de monitoramento
 
-- Track AUC-ROC, F1 and Recall as true labels become available
-- Detect drift with PSI on key features (`PAY_0`, `meses_em_atraso`, `utilizacao_credito`)
-- Retrain when PSI > 0.25, AUC-ROC drops more than 0.05 from validation, or quarterly
-- Version model and training data, log every prediction with timestamp
+- Acompanhar AUC-ROC, F1 e Recall conforme chegarem os rótulos (pagou ou não pagou)
+- Detectar drift com PSI nas variáveis principais (`PAY_0`, `meses_em_atraso`, `utilizacao_credito`)
+- Retreinar quando o PSI passar de 0,25, o AUC-ROC cair mais de 0,05 em relação à validação, ou a cada trimestre
+- Versionar modelo e dados de treino, e registrar cada previsão com data e hora
 
-## Limitations and next steps
+## Limitações e próximos passos
 
-- All reported metrics come from the validation set, which was also used to pick the model and the threshold, so they are likely a bit optimistic. The test set was split and scaled but not used for a final evaluation. Next step: evaluate the final model once on `X_test`.
-- F1 target not met (see above). Possible directions: cost-sensitive learning, stacking, or external data such as credit bureau history.
-- The synthetic demo samples each feature independently and uniformly, so the generated clients don't follow the joint distribution of the real data.
+- Todas as métricas vêm do conjunto de validação, que também foi usado para escolher o modelo e o threshold, então tendem a estar um pouco otimistas. O conjunto de teste foi separado e normalizado, mas não foi usado numa avaliação final. Próximo passo: avaliar o modelo final uma única vez em `X_test`.
+- Meta de F1 não atingida (ver acima). Caminhos possíveis: aprendizado sensível a custo, stacking, ou dados externos como histórico em birôs de crédito.
+- A demonstração sintética sorteia cada variável de forma independente e uniforme, então os clientes gerados não seguem a distribuição conjunta dos dados originais.
 
-## How to run
+## Como executar
 
-**Colab (recommended):** open the link at the top and run all cells. Everything installs and downloads automatically.
+**Colab (recomendado):** abra o link no topo e execute todas as células. A instalação das bibliotecas e o download dos dados acontecem automaticamente.
 
 **Local:**
 
@@ -114,13 +114,13 @@ pip install -r requirements.txt
 jupyter notebook previsao_inadimplencia_cartao_credito.ipynb
 ```
 
-The `RandomizedSearchCV` cell can take 5 to 15 minutes depending on the machine.
+A célula do `RandomizedSearchCV` pode levar de 5 a 15 minutos, dependendo da máquina.
 
-## Tech stack
+## Tecnologias
 
 Python, pandas, NumPy, scikit-learn, XGBoost, imbalanced-learn, SHAP, Matplotlib, seaborn, Faker, ucimlrepo
 
-## Author
+## Autor
 
 Leonardo Ramos Coutinho
 [LinkedIn](https://www.linkedin.com/in/leonardorcoutinho)
